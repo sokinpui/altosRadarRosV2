@@ -258,6 +258,6 @@ int main(int argc, char** argv) {
     }
 
     free(histBuf);
-    fclose(fp);
+    close(sockfd);
     return 0;
 }
