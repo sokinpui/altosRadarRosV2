@@ -168,10 +168,6 @@ void calPoint(vector<POINTCLOUD> pointCloudVec,pcl::PointCloud<pcl::PointXYZHSV>
 }
 
 int main(int argc, char** argv) {
-    if(argc !=3)
-    {
-        printf("para cnt error!\n");
-    }
     // rcs read
     float* rcsBuf = (float*)malloc(1201 * sizeof(float));
     FILE* fp_rcs = fopen("data//rcs.dat", "rb");
@@ -212,21 +208,18 @@ int main(int argc, char** argv) {
     //         tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
     // FILE* fp = fopen(filePath, "wb");
 
-    FILE *fp = fopen(argv[2],"rb");
-    printf("%s\n",argv[2]);
-    if (NULL == fp)
-    {
-        printf("File not exit!\n");
-        sleep(3);
-        return -1; /* 要返回错误代码 */
+    int sockfd = socketGen();
+    if (sockfd == 0) {
+        printf("Socket generation failed!\n");
+        return -1;
     }
+    struct sockaddr_in from;
+    socklen_t len = sizeof(from);
 
     while(ros::ok())
     {
         memset(recvBuf,0,sizeof(POINTCLOUD));
-        int ret = fread(recvBuf,1368,1,fp);
-        // printf("ret = %d\n",ret);
-        // int ret = recvfrom(sockfd, recvBuf, sizeof(POINTCLOUD), 0, (struct sockaddr *)&from, &len);
+        int ret = recvfrom(sockfd, recvBuf, sizeof(POINTCLOUD), 0, (struct sockaddr *)&from, &len);
         if (ret > 0)
 		{
             // fwrite(recvBuf, 1, ret, fp);
@@ -267,6 +260,6 @@ int main(int argc, char** argv) {
     }
 
     free(histBuf);
-    fclose(fp);
+    close(sockfd);
     return 0;
 }
