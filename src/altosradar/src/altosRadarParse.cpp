@@ -134,10 +134,10 @@ void calPoint(vector<POINTCLOUD> pointCloudVec,pcl::PointCloud<pcl::PointXYZHSV>
             {
                 pointCloudVec[i].point[j].ele = installFlag*(pointCloudVec[i].point[j].ele);
 
-                cloudPoint.x = (pointCloudVec[i].point[j].range)*cos(pointCloudVec[i].point[j].azi)*cos(pointCloudVec[i].point[j].ele); 
-                cloudPoint.y = (pointCloudVec[i].point[j].range)*sin(pointCloudVec[i].point[j].azi)*cos(pointCloudVec[i].point[j].ele);; 
-                cloudPoint.z = (pointCloudVec[i].point[j].range)*sin(pointCloudVec[i].point[j].ele) ; 
-                cloudPoint.h = pointCloudVec[i].point[j].doppler; 
+                cloudPoint.x = (pointCloudVec[i].point[j].range)*cos(pointCloudVec[i].point[j].azi)*cos(pointCloudVec[i].point[j].ele);
+                cloudPoint.y = (pointCloudVec[i].point[j].range)*sin(pointCloudVec[i].point[j].azi)*cos(pointCloudVec[i].point[j].ele);;
+                cloudPoint.z = (pointCloudVec[i].point[j].range)*sin(pointCloudVec[i].point[j].ele) ;
+                cloudPoint.h = pointCloudVec[i].point[j].doppler;
                 cloudPoint.s = rcsCal(pointCloudVec[i].point[j].range,pointCloudVec[i].point[j].azi,pointCloudVec[i].point[j].snr,rcsBuf);
                 cloud->push_back(cloudPoint);
             }
@@ -209,16 +209,14 @@ int main(int argc, char** argv) {
     // FILE* fp = fopen(filePath, "wb");
 
     int sockfd = socketGen();
-    if (sockfd == 0) {
-        printf("Socket generation failed!\n");
-        return -1;
-    }
     struct sockaddr_in from;
     socklen_t len = sizeof(from);
 
     while(ros::ok())
     {
         memset(recvBuf,0,sizeof(POINTCLOUD));
+        // int ret = fread(recvBuf,1368,1,fp);
+        // printf("ret = %d\n",ret);
         int ret = recvfrom(sockfd, recvBuf, sizeof(POINTCLOUD), 0, (struct sockaddr *)&from, &len);
         if (ret > 0)
 		{
@@ -260,6 +258,6 @@ int main(int argc, char** argv) {
     }
 
     free(histBuf);
-    close(sockfd);
+    fclose(fp);
     return 0;
 }
